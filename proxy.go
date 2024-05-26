@@ -151,6 +151,14 @@ func (p *Proxy) SetDownstreamProxy(proxyURL *url.URL) {
 	}
 }
 
+// SetDynamicDownstreamProxy sets the proxy that receives requests from the upstream
+// proxy.
+func (p *Proxy) SetDynamicDownstreamProxy(fn func(*http.Request) (*url.URL, error)) {
+	if tr, ok := p.roundTripper.(*http.Transport); ok {
+		tr.Proxy = fn
+	}
+}
+
 // SetTimeout sets the request timeout of the proxy.
 func (p *Proxy) SetTimeout(timeout time.Duration) {
 	p.timeout = timeout
