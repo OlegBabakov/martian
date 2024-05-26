@@ -1,4 +1,4 @@
-module github.com/OlegBabakov/martian
+module github.com/OlegBabakov/martian/v3
 
 go 1.19
 
