@@ -1,4 +1,4 @@
-module github.com/projectdiscovery/martian/v3
+module github.com/OlegBabakov/martian
 
 go 1.19
 
