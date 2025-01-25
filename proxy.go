@@ -552,8 +552,6 @@ func (p *Proxy) handleConnectRequest(ctx *Context, req *http.Request, session *S
 			p.dataUsage(n, directionOut)
 		}
 
-		log.Infof("Direction: %v. Bytes: %d. URL: %s", directionOut, n, req.URL.RequestURI())
-
 		log.Debugf("martian: CONNECT tunnel finished copying")
 		donec <- true
 	}
