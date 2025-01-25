@@ -417,7 +417,7 @@ func (p *Proxy) handleConnectRequest(ctx *Context, req *http.Request, session *S
 	}
 
 	// Setup Mitm Connection
-	if shouldMitm {
+	if shouldMitm && p.mitm != nil {
 		log.Debugf("martian: attempting MITM for connection: %s / %s", req.Host, req.URL.String())
 
 		res := proxyutil.NewResponse(http.StatusOK, nil, req)
@@ -539,18 +539,23 @@ func (p *Proxy) handleConnectRequest(ctx *Context, req *http.Request, session *S
 	cbr := bufio.NewReader(cconn)
 	defer cbw.Flush()
 
-	copySync := func(w io.Writer, r io.Reader, donec chan<- bool, hostname string) {
-		if _, err := io.Copy(w, r); err != nil && err != io.EOF {
+	copySync := func(w io.Writer, r io.Reader, donec chan<- bool, hostname string, req *http.Request, directionOut bool) {
+		var err error
+		var n int64
+
+		if n, err = io.Copy(w, r); err != nil && err != io.EOF {
 			log.Debugf("martian: failed to copy CONNECT tunnel for %v: %v", hostname, err)
 		}
+
+		log.Infof("Direction: %v. Bytes: %d. URL: %s", directionOut, n, req.URL.RequestURI())
 
 		log.Debugf("martian: CONNECT tunnel finished copying")
 		donec <- true
 	}
 
 	donec := make(chan bool, 2)
-	go copySync(cbw, brw, donec, req.Host)
-	go copySync(brw, cbr, donec, req.Host)
+	go copySync(cbw, brw, donec, req.Host, req, true)
+	go copySync(brw, cbr, donec, req.Host, req, false)
 
 	log.Debugf("martian: established CONNECT tunnel, proxying traffic")
 	<-donec

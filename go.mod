@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/golang/snappy v0.0.3
 	github.com/projectdiscovery/gologger v1.1.8
+	github.com/projectdiscovery/martian/v3 v3.0.0-20240219194442-fed3b744f477
 	github.com/projectdiscovery/utils v0.0.17
 	golang.org/x/net v0.8.0
 	google.golang.org/grpc v1.37.0
