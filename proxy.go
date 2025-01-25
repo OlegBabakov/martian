@@ -104,6 +104,7 @@ type Proxy struct {
 	closing            chan bool
 	reqmod             RequestModifier
 	resmod             ResponseModifier
+	dataUsage          func(dataBytes int64, outgoing bool)
 }
 
 // NewProxy returns a new HTTP proxy.
@@ -545,6 +546,10 @@ func (p *Proxy) handleConnectRequest(ctx *Context, req *http.Request, session *S
 
 		if n, err = io.Copy(w, r); err != nil && err != io.EOF {
 			log.Debugf("martian: failed to copy CONNECT tunnel for %v: %v", hostname, err)
+		}
+
+		if p.dataUsage != nil {
+			p.dataUsage(n, directionOut)
 		}
 
 		log.Infof("Direction: %v. Bytes: %d. URL: %s", directionOut, n, req.URL.RequestURI())
