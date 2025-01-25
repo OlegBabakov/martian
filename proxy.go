@@ -104,7 +104,7 @@ type Proxy struct {
 	closing            chan bool
 	reqmod             RequestModifier
 	resmod             ResponseModifier
-	dataUsage          func(dataBytes int64, outgoing bool)
+	DataUsage          func(dataBytes int64, outgoing bool)
 }
 
 // NewProxy returns a new HTTP proxy.
@@ -548,8 +548,8 @@ func (p *Proxy) handleConnectRequest(ctx *Context, req *http.Request, session *S
 			log.Debugf("martian: failed to copy CONNECT tunnel for %v: %v", hostname, err)
 		}
 
-		if p.dataUsage != nil {
-			p.dataUsage(n, directionOut)
+		if p.DataUsage != nil {
+			p.DataUsage(n, directionOut)
 		}
 
 		log.Debugf("martian: CONNECT tunnel finished copying")
