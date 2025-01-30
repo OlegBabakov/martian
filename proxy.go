@@ -105,6 +105,7 @@ type Proxy struct {
 	reqmod             RequestModifier
 	resmod             ResponseModifier
 	DataUsage          func(dataBytes int64, outgoing bool)
+	ForceClosing       bool
 }
 
 // NewProxy returns a new HTTP proxy.
@@ -559,6 +560,12 @@ func (p *Proxy) handleConnectRequest(ctx *Context, req *http.Request, session *S
 	donec := make(chan bool, 2)
 	go copySync(cbw, brw, donec, req.Host, req, true)
 	go copySync(brw, cbr, donec, req.Host, req, false)
+	if p.ForceClosing {
+		go func() {
+			<-p.closing
+			cconn.Close()
+		}()
+	}
 
 	log.Debugf("martian: established CONNECT tunnel, proxying traffic")
 	<-donec
